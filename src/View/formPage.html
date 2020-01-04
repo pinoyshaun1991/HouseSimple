@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>URL Shortener</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    </head>
+    <body>
+
+        <div class="container">
+            <h2>Please enter URL you want to shorten:</h2>
+            <form id="shortenForm">
+                <div class="form-group">
+                    <label for="url">URL:</label>
+                    <input type="url" class="form-control" placeholder="Enter url e.g. http://example.com" name="url" style="width: 35%;" required>
+                </div>
+                <button id="submitAPI" type="submit" class="btn btn-default">Submit by API</button>
+                <button id="submitDatabase" type="submit" class="btn btn-default">Submit to Database</button>
+            </form>
+            <p></p>
+            <div id="result"><p></p></div>
+        </div>
+
+        <script type="text/javascript">
+            $(document).ready(function() {
+                $('#submitAPI').on('click', function(e) {
+                    e.preventDefault();
+                    var formData = $('form#shortenForm').serializeArray();
+                    var url      = '';
+
+                    if (isUrlValid(formData[0].value)) {
+                        url = formData[0].value;
+                    } else {
+                        alert('Please enter a valid URL');
+                    }
+
+                    $.ajax({
+                        dataType: 'json',
+                        type: 'POST',
+                        url: 'src/Service/dataHandler.php',
+                        async: false,
+                        data: {url: url}
+                    }).done(function (response) {
+                        if (response.code === 200) {
+                            $('#result p').html('Short URL: <a target="_blank" href="'+response.destination+'">'+response.shortURL+'</a>');
+                        } else {
+                            $('#result').html('Invalid API response');
+                        }
+                    });
+                });
+
+                $('#submitDatabase').on('click', function(e) {
+                    e.preventDefault();
+                    var formData = $('form#shortenForm').serializeArray();
+                    var url      = '';
+
+                    if (isUrlValid(formData[0].value)) {
+                        url = formData[0].value;
+                    } else {
+                        alert('Please enter a valid URL');
+                    }
+
+                    $.ajax({
+                        dataType: 'json',
+                        type: 'POST',
+                        url: 'src/Service/dataHandler.php',
+                        async: false,
+                        data: {urlDatabase: url}
+                    }).done(function (response) {
+                        if (response.code === 200) {
+                            $('#result p').html('Short URL: <a target="_blank" href="'+response.destination+'">'+response.shortURL+'</a>');
+                        } else {
+                            $('#result').html('Invalid API response');
+                        }
+                    });
+                });
+
+                function isUrlValid(url) {
+                    return /^(https?|s?ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(url);
+                }
+
+            });
+        </script>
+    </body>
+</html>
